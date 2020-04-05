@@ -12,20 +12,14 @@ import java.util.List;
 public class JsonUtils {
 
     public static Sandwich parseSandwichJson(String json) {
-        JSONObject sandwichJson = null;
         Sandwich sandwich = new Sandwich();
-        List<String> alsoKnownAs = new ArrayList<String>();
-        List<String> ingredients = new ArrayList<String>();
         try {
-            sandwichJson = new JSONObject(json);
+            JSONObject sandwichJson = new JSONObject(json);
             // Parsing mainName
             JSONObject nameObject = sandwichJson.getJSONObject("name");
             sandwich.setMainName(nameObject.getString("mainName"));
             // Parsing alsoKnownAs
-            JSONArray akaArray = nameObject.getJSONArray("alsoKnownAs");
-            for (int i = 0; i < akaArray.length(); i++)
-                alsoKnownAs.add(akaArray.getString(i));
-            sandwich.setAlsoKnownAs(alsoKnownAs);
+            sandwich.setAlsoKnownAs(convertJSONArrayToList(nameObject.getJSONArray("alsoKnownAs")));
             // Parsing placeOfOrigin
             sandwich.setPlaceOfOrigin(sandwichJson.getString("placeOfOrigin"));
             // Parsing description
@@ -33,13 +27,19 @@ public class JsonUtils {
             // Parsing image
             sandwich.setImage(sandwichJson.getString("image"));
             // Parsing ingredients
-            JSONArray ingredientsArray = nameObject.getJSONArray("ingredients");
-            for (int i = 0; i < ingredientsArray.length(); i++)
-                ingredients.add(ingredientsArray.getString(i));
-            sandwich.setIngredients(ingredients);
+            sandwich.setIngredients(convertJSONArrayToList(sandwichJson.getJSONArray("ingredients")));
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return sandwich;
+    }
+
+    private static List<String> convertJSONArrayToList(JSONArray array) throws JSONException {
+        if (array == null)
+            return null;
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++)
+            list.add(array.getString(i));
+        return list;
     }
 }
